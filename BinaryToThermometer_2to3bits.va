@@ -1,0 +1,42 @@
+// VerilogA for ADC_DACs, B2T_2to3bits, veriloga
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module B2T_2to3bits(D0,D1,B0,B1,B2,vdd,vss);
+
+parameter real vtrans=0.5;
+parameter real delay = 0;
+parameter real ttime = 1p;
+
+inout vdd,vss;
+input D0,D1;
+output B0,B1,B2;
+
+electrical vdd,vss;
+electrical D0,D1;
+electrical B0,B1,B2;
+
+real b_0,b_1,b_2;
+
+analog begin
+	if ((V(D1)>0.9) && (V(D0)>0.9)) begin 
+		b_2 = V(vdd);	b_1 = V(vdd);	b_0 = V(vdd); 
+		end
+	else if ((V(D1)>0.9) && (V(D0)<0.9)) begin 
+		b_2 = V(vss);	b_1 = V(vdd);	b_0 = V(vdd); 
+		end
+	else if ((V(D1)<0.9) && (V(D0)>0.9)) begin 
+		b_2 = V(vss);	b_1 = V(vss);	b_0 = V(vdd); 
+		end
+	else begin 
+		b_2 = V(vss);	b_1 = V(vss);	b_0 = V(vss); 
+		end
+
+	V(B2) <+ transition(b_2,delay,ttime);
+	V(B1) <+ transition(b_1,delay,ttime);
+	V(B0) <+ transition(b_0,delay,ttime);
+
+
+end
+endmodule
